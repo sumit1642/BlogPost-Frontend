@@ -1,17 +1,12 @@
-/* eslint-disable no-unused-vars */
-// src/components/Navbar.jsx
 import React, { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { AppBar, Toolbar, Typography, Button, Box, Menu, MenuItem, Avatar } from "@mui/material"
+import { useAuth } from "../hooks/useAuth"
 
 export const Navbar = () => {
-	const [user, setUser] = useState(null) // Will be managed later with API
+	const { user, isAuthenticated, logout } = useAuth()
 	const [anchorEl, setAnchorEl] = useState(null)
 	const navigate = useNavigate()
-
-	// Mock user for UI demonstration - remove when adding API
-	const mockUser = { name: "John Doe", email: "john@example.com" }
-	const isAuthenticated = false // Change to true to see authenticated state
 
 	const handleMenu = (event) => {
 		setAnchorEl(event.currentTarget)
@@ -22,10 +17,18 @@ export const Navbar = () => {
 	}
 
 	const handleLogout = () => {
-		// Will add API call later
-		setUser(null)
+		logout()
 		handleClose()
-		navigate("/")
+	}
+
+	const handleProfile = () => {
+		navigate("/profile")
+		handleClose()
+	}
+
+	const handleMyPosts = () => {
+		navigate("/my-posts")
+		handleClose()
 	}
 
 	return (
@@ -56,7 +59,7 @@ export const Navbar = () => {
 							<Typography
 								variant="body2"
 								sx={{ color: "#666" }}>
-								Welcome, {mockUser.name}
+								Welcome, {user?.name}
 							</Typography>
 							<Avatar
 								sx={{
@@ -66,14 +69,14 @@ export const Navbar = () => {
 									cursor: "pointer",
 								}}
 								onClick={handleMenu}>
-								{mockUser.name.charAt(0)}
+								{user?.name?.charAt(0)}
 							</Avatar>
 							<Menu
 								anchorEl={anchorEl}
 								open={Boolean(anchorEl)}
 								onClose={handleClose}>
-								<MenuItem onClick={handleClose}>Profile</MenuItem>
-								<MenuItem onClick={handleClose}>My Posts</MenuItem>
+								<MenuItem onClick={handleProfile}>Profile</MenuItem>
+								<MenuItem onClick={handleMyPosts}>My Posts</MenuItem>
 								<MenuItem onClick={handleLogout}>Logout</MenuItem>
 							</Menu>
 						</>

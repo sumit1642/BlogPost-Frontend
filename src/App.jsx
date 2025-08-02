@@ -1,14 +1,30 @@
-// src/App.jsx
+// Final update to App.jsx to include all routes
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import CssBaseline from "@mui/material/CssBaseline"
 import { Navbar } from "./components/Navbar"
 import { HomePage } from "./components/HomePage"
 import { LoginPage } from "./components/auth/LoginPage"
 import { RegisterPage } from "./components/auth/RegisterPage"
+import { PostDetail } from "./components/PostDetail"
+import { ProfilePage } from "./components/ProfilePage"
+import { MyPostsPage } from "./components/MyPostsPage"
+import { TagsPage } from "./components/TagsPage"
+import { TagPostsPage } from "./components/TagPostsPage"
+import { AuthGuard } from "./components/AuthGuard"
 
-// Base URL for API calls - will be used later
 export const BASE_URL = "http://localhost:3000"
+
+// Create a client for React Query
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			retry: 1,
+			staleTime: 5 * 60 * 1000, // 5 minutes
+		},
+	},
+})
 
 // Custom Material UI theme
 const theme = createTheme({
@@ -64,39 +80,86 @@ const theme = createTheme({
 function App() {
 	const routes = createBrowserRouter([
 		{
-			path: `/`,
+			path: "/",
 			element: (
-				<>
+				<AuthGuard>
 					<Navbar />
 					<HomePage />
-				</>
+				</AuthGuard>
 			),
 		},
 		{
-			path: `/login`,
+			path: "/login",
 			element: (
-				<>
+				<AuthGuard>
 					<Navbar />
 					<LoginPage />
-				</>
+				</AuthGuard>
 			),
 		},
 		{
-			path: `/register`,
+			path: "/register",
 			element: (
-				<>
+				<AuthGuard>
 					<Navbar />
 					<RegisterPage />
-				</>
+				</AuthGuard>
+			),
+		},
+		{
+			path: "/post/:postId",
+			element: (
+				<AuthGuard>
+					<Navbar />
+					<PostDetail />
+				</AuthGuard>
+			),
+		},
+		{
+			path: "/profile",
+			element: (
+				<AuthGuard requireAuth>
+					<Navbar />
+					<ProfilePage />
+				</AuthGuard>
+			),
+		},
+		{
+			path: "/my-posts",
+			element: (
+				<AuthGuard requireAuth>
+					<Navbar />
+					<MyPostsPage />
+				</AuthGuard>
+			),
+		},
+		{
+			path: "/tags",
+			element: (
+				<AuthGuard>
+					<Navbar />
+					<TagsPage />
+				</AuthGuard>
+			),
+		},
+		{
+			path: "/tags/:tagId/posts",
+			element: (
+				<AuthGuard>
+					<Navbar />
+					<TagPostsPage />
+				</AuthGuard>
 			),
 		},
 	])
 
 	return (
-		<ThemeProvider theme={theme}>
-			<CssBaseline />
-			<RouterProvider router={routes} />
-		</ThemeProvider>
+		<QueryClientProvider client={queryClient}>
+			<ThemeProvider theme={theme}>
+				<CssBaseline />
+				<RouterProvider router={routes} />
+			</ThemeProvider>
+		</QueryClientProvider>
 	)
 }
 

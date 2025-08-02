@@ -1,6 +1,5 @@
-// src/components/auth/RegisterPage.jsx
 import React, { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
+import { Link } from "react-router-dom"
 import {
 	Container,
 	Paper,
@@ -11,16 +10,15 @@ import {
 	Alert,
 	CircularProgress,
 } from "@mui/material"
+import { useAuth } from "../../hooks/useAuth"
 
 export const RegisterPage = () => {
+	const { register, isRegisterLoading, registerError } = useAuth()
 	const [formData, setFormData] = useState({
 		name: "",
 		email: "",
 		password: "",
 	})
-	const [loading, setLoading] = useState(false)
-	const [error, setError] = useState("")
-	const navigate = useNavigate()
 
 	const handleChange = (e) => {
 		setFormData({
@@ -29,64 +27,9 @@ export const RegisterPage = () => {
 		})
 	}
 
-	const validateForm = () => {
-		if (!formData.name.trim()) {
-			setError("Name is required")
-			return false
-		}
-		if (formData.name.trim().length < 2) {
-			setError("Name must be at least 2 characters long")
-			return false
-		}
-		if (!formData.email.trim()) {
-			setError("Email is required")
-			return false
-		}
-		if (!formData.password) {
-			setError("Password is required")
-			return false
-		}
-		if (formData.password.length < 6) {
-			setError("Password must be at least 6 characters long")
-			return false
-		}
-		return true
-	}
-
 	const handleSubmit = async (e) => {
 		e.preventDefault()
-		setError("")
-
-		if (!validateForm()) {
-			return
-		}
-
-		setLoading(true)
-
-		// Simulate API call
-		setTimeout(() => {
-			// Mock successful registration
-			navigate("/login")
-			setLoading(false)
-		}, 1000)
-
-		// Future API call will be:
-		// try {
-		//   const response = await fetch(`${BASE_URL}/api/auth/register`, {
-		//     method: "POST",
-		//     headers: { "Content-Type": "application/json" },
-		//     credentials: "include",
-		//     body: JSON.stringify(formData),
-		//   })
-		//   const data = await response.json()
-		//   if (data.status === "success") {
-		//     navigate("/login")
-		//   } else {
-		//     setError(data.message)
-		//   }
-		// } catch (error) {
-		//   setError("Registration failed. Please try again.")
-		// }
+		register(formData)
 	}
 
 	return (
@@ -117,11 +60,11 @@ export const RegisterPage = () => {
 					Join our community and start sharing your thoughts
 				</Typography>
 
-				{error && (
+				{registerError && (
 					<Alert
 						severity="error"
 						sx={{ width: "100%", mb: 2 }}>
-						{error}
+						{registerError}
 					</Alert>
 				)}
 
@@ -175,7 +118,7 @@ export const RegisterPage = () => {
 						type="submit"
 						fullWidth
 						variant="contained"
-						disabled={loading}
+						disabled={isRegisterLoading}
 						sx={{
 							mt: 2,
 							mb: 2,
@@ -183,7 +126,7 @@ export const RegisterPage = () => {
 							backgroundColor: "#1976d2",
 							"&:hover": { backgroundColor: "#1565c0" },
 						}}>
-						{loading ? (
+						{isRegisterLoading ? (
 							<CircularProgress
 								size={24}
 								color="inherit"
