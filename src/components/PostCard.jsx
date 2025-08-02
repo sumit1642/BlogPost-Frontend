@@ -1,4 +1,3 @@
-// src/components/posts/PostCard.jsx
 import React from "react"
 import {
 	Card,
@@ -9,37 +8,14 @@ import {
 	Avatar,
 	IconButton,
 	Divider,
-	Menu,
-	MenuItem,
 } from "@mui/material"
-import {
-	FavoriteOutlined,
-	ChatBubbleOutline,
-	Favorite,
-	MoreVert,
-	Edit,
-	Delete,
-	Visibility,
-} from "@mui/icons-material"
+import { FavoriteOutlined, ChatBubbleOutline, Favorite } from "@mui/icons-material"
+import { usePost } from "../hooks/usePost"
+import { useAuth } from "../hooks/useAuth"
 
-export const PostCard = ({
-	post,
-	onLike,
-	onEdit,
-	onDelete,
-	onView,
-	showActions = false,
-	currentUserId = null,
-}) => {
-	const [anchorEl, setAnchorEl] = React.useState(null)
-
-	const handleMenuOpen = (event) => {
-		setAnchorEl(event.currentTarget)
-	}
-
-	const handleMenuClose = () => {
-		setAnchorEl(null)
-	}
+export function PostCard({ post, onClick }) {
+	const { isAuthenticated } = useAuth()
+	const { toggleLike, isToggling } = usePost(post.id)
 
 	const formatDate = (dateString) => {
 		return new Date(dateString).toLocaleDateString("en-US", {
@@ -49,7 +25,16 @@ export const PostCard = ({
 		})
 	}
 
-	const isOwner = currentUserId && post.author?.id === currentUserId
+	const handleLike = async (e) => {
+		e.stopPropagation()
+		if (!isAuthenticated) return
+
+		try {
+			await toggleLike()
+		} catch (error) {
+			console.error("Failed to toggle like:", error)
+		}
+	}
 
 	return (
 		<Card
@@ -60,7 +45,9 @@ export const PostCard = ({
 					transform: "translateY(-2px)",
 				},
 				transition: "all 0.3s ease",
-			}}>
+				cursor: onClick ? "pointer" : "default",
+			}}
+			onClick={onClick}>
 			<CardContent sx={{ p: 3 }}>
 				<Box
 					display="flex"
@@ -73,80 +60,12 @@ export const PostCard = ({
 						sx={{ fontWeight: 600, color: "#333" }}>
 						{post.title}
 					</Typography>
-					<Box
-						display="flex"
-						alignItems="center"
-						gap={1}>
-						<Typography
-							variant="caption"
-							color="text.secondary">
-							{formatDate(post.createdAt)}
-						</Typography>
-						{showActions && (
-							<>
-								<IconButton
-									size="small"
-									onClick={handleMenuOpen}>
-									<MoreVert />
-								</IconButton>
-								<Menu
-									anchorEl={anchorEl}
-									open={Boolean(anchorEl)}
-									onClose={handleMenuClose}>
-									<MenuItem
-										onClick={() => {
-											onView?.(post.id)
-											handleMenuClose()
-										}}>
-										<Visibility
-											fontSize="small"
-											sx={{ mr: 1 }}
-										/>
-										View
-									</MenuItem>
-									{isOwner && (
-										<>
-											<MenuItem
-												onClick={() => {
-													onEdit?.(post.id)
-													handleMenuClose()
-												}}>
-												<Edit
-													fontSize="small"
-													sx={{ mr: 1 }}
-												/>
-												Edit
-											</MenuItem>
-											<MenuItem
-												onClick={() => {
-													onDelete?.(post.id)
-													handleMenuClose()
-												}}>
-												<Delete
-													fontSize="small"
-													sx={{ mr: 1 }}
-												/>
-												Delete
-											</MenuItem>
-										</>
-									)}
-								</Menu>
-							</>
-						)}
-					</Box>
+					<Typography
+						variant="caption"
+						color="text.secondary">
+						{formatDate(post.createdAt)}
+					</Typography>
 				</Box>
-
-				{!post.published && (
-					<Chip
-						label="Draft"
-						size="small"
-						sx={{
-							backgroundColor: "#fff3e0",
-							color: "#f57c00",
-							mb: 2,
-						}}
-					/>
-				)}
 
 				<Typography
 					variant="body1"
@@ -213,7 +132,8 @@ export const PostCard = ({
 							alignItems="center">
 							<IconButton
 								size="small"
-								onClick={() => onLike?.(post.id)}
+								onClick={handleLike}
+								disabled={!isAuthenticated || isToggling}
 								sx={{
 									color: post.isLikedByUser ? "#f44336" : "#666",
 								}}>

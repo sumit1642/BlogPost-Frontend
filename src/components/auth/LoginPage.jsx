@@ -1,6 +1,5 @@
-// src/components/auth/LoginPage.jsx
 import React, { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
+import { Link } from "react-router-dom"
 import {
 	Container,
 	Paper,
@@ -11,15 +10,14 @@ import {
 	Alert,
 	CircularProgress,
 } from "@mui/material"
+import { useAuth } from "../../hooks/useAuth"
 
 export const LoginPage = () => {
+	const { login, isLoginLoading, loginError } = useAuth()
 	const [formData, setFormData] = useState({
 		email: "",
 		password: "",
 	})
-	const [loading, setLoading] = useState(false)
-	const [error, setError] = useState("")
-	const navigate = useNavigate()
 
 	const handleChange = (e) => {
 		setFormData({
@@ -30,37 +28,7 @@ export const LoginPage = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault()
-		setLoading(true)
-		setError("")
-
-		// Simulate API call
-		setTimeout(() => {
-			if (formData.email && formData.password) {
-				// Mock successful login
-				navigate("/")
-			} else {
-				setError("Please fill in all fields")
-			}
-			setLoading(false)
-		}, 1000)
-
-		// Future API call will be:
-		// try {
-		//   const response = await fetch(`${BASE_URL}/api/auth/login`, {
-		//     method: "POST",
-		//     headers: { "Content-Type": "application/json" },
-		//     credentials: "include",
-		//     body: JSON.stringify(formData),
-		//   })
-		//   const data = await response.json()
-		//   if (data.status === "success") {
-		//     navigate("/")
-		//   } else {
-		//     setError(data.message)
-		//   }
-		// } catch (error) {
-		//   setError("Login failed. Please try again.")
-		// }
+		login(formData)
 	}
 
 	return (
@@ -91,11 +59,11 @@ export const LoginPage = () => {
 					Sign in to your account to continue
 				</Typography>
 
-				{error && (
+				{loginError && (
 					<Alert
 						severity="error"
 						sx={{ width: "100%", mb: 2 }}>
-						{error}
+						{loginError}
 					</Alert>
 				)}
 
@@ -135,7 +103,7 @@ export const LoginPage = () => {
 						type="submit"
 						fullWidth
 						variant="contained"
-						disabled={loading}
+						disabled={isLoginLoading}
 						sx={{
 							mt: 2,
 							mb: 2,
@@ -143,7 +111,7 @@ export const LoginPage = () => {
 							backgroundColor: "#1976d2",
 							"&:hover": { backgroundColor: "#1565c0" },
 						}}>
-						{loading ? (
+						{isLoginLoading ? (
 							<CircularProgress
 								size={24}
 								color="inherit"
