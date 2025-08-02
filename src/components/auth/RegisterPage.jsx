@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+// src/components/auth/RegisterPage.jsx
+import React, { useState } from "react";
 import { Link } from "react-router-dom"
 import {
 	Container,

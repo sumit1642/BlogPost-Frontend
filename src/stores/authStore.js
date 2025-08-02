@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 // src/stores/authStore.js - Zustand auth store
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'

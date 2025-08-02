@@ -1,4 +1,5 @@
-import React from "react"
+// src/components/PostDetail.jsx
+import React from "react";
 import { useParams, useNavigate } from "react-router-dom"
 import {
 	Container,

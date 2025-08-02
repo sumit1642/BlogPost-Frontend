@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+// src/components/Navbar.jsx
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"
 import { AppBar, Toolbar, Typography, Button, Box, Menu, MenuItem, Avatar } from "@mui/material"
 import { useAuth } from "../hooks/useAuth"

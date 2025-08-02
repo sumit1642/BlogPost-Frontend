@@ -1,4 +1,5 @@
-import React from "react"
+// src/components/PostCard.jsx
+import React from "react";
 import {
 	Card,
 	CardContent,

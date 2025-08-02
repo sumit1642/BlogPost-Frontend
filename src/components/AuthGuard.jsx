@@ -1,4 +1,5 @@
-import { useEffect } from "react"
+// src/components/AuthGuard.jsx
+import { useEffect } from "react";
 import { useAuth } from "../hooks/useAuth"
 import { CircularProgress, Box } from "@mui/material"
 
