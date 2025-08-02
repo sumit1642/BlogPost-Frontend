@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+// src/components/ProfilePage.jsx
+import React, { useState } from "react";
 import {
 	Container,
 	Paper,

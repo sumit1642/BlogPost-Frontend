@@ -1,4 +1,4 @@
-// Final update to App.jsx to include all routes
+// App.jsx 
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"

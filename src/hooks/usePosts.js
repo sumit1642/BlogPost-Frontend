@@ -1,4 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+// src/hooks/usePosts.js
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { usePostStore } from "../stores/postStore"
 import { apiClient } from "../api/client"
 

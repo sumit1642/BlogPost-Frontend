@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+// src/components/CreatePostDialog.jsx
+import React, { useState } from "react";
 import {
 	Dialog,
 	DialogTitle,

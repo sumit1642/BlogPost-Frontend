@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+// src/hooks/useAuth.js
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useAuthStore } from "../stores/authStore"
 import { apiClient } from "../api/client"
