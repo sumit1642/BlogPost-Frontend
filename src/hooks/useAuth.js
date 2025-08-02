@@ -5,24 +5,38 @@ import { apiClient } from "../api/client"
 import { useNavigate } from "react-router-dom"
 
 export function useAuth() {
-	const { user, isAuthenticated, setUser, logout: logoutStore, checkAuth } = useAuthStore()
+	const {
+		user,
+		isAuthenticated,
+		setUser,
+		logout: logoutStore,
+		checkAuth,
+		isLoading,
+		setLoading,
+	} = useAuthStore()
 	const queryClient = useQueryClient()
 	const navigate = useNavigate()
 
 	const loginMutation = useMutation({
 		mutationFn: apiClient.login.bind(apiClient),
+		onMutate: () => setLoading(true),
 		onSuccess: (data) => {
 			setUser(data.data.user)
 			queryClient.invalidateQueries()
 			navigate("/")
 		},
+		onError: () => setLoading(false),
+		onSettled: () => setLoading(false),
 	})
 
 	const registerMutation = useMutation({
 		mutationFn: apiClient.register.bind(apiClient),
+		onMutate: () => setLoading(true),
 		onSuccess: () => {
 			navigate("/login")
 		},
+		onError: () => setLoading(false),
+		onSettled: () => setLoading(false),
 	})
 
 	const logoutMutation = useMutation({
@@ -31,6 +45,17 @@ export function useAuth() {
 			logoutStore()
 			queryClient.clear()
 			navigate("/")
+		},
+	})
+
+	const refreshMutation = useMutation({
+		mutationFn: apiClient.refreshToken.bind(apiClient),
+		onSuccess: (data) => {
+			setUser(data.data.user)
+			queryClient.invalidateQueries()
+		},
+		onError: () => {
+			logoutStore()
 		},
 	})
 
@@ -45,12 +70,16 @@ export function useAuth() {
 		user,
 		isAuthenticated,
 		isCheckingAuth,
+		isLoading,
 		login: loginMutation.mutate,
 		register: registerMutation.mutate,
 		logout: logoutMutation.mutate,
+		refreshToken: refreshMutation.mutate,
 		isLoginLoading: loginMutation.isPending,
 		isRegisterLoading: registerMutation.isPending,
+		isRefreshing: refreshMutation.isPending,
 		loginError: loginMutation.error?.message,
 		registerError: registerMutation.error?.message,
+		authData,
 	}
 }

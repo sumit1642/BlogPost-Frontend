@@ -1,10 +1,10 @@
 // src/hooks/usePost.js
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { usePostStore } from "../stores/postStore"
 import { apiClient } from "../api/client"
 
 export function usePost(postId) {
-	const { currentPost, setCurrentPost } = usePostStore()
+	const { currentPost, setCurrentPost, updatePostLike } = usePostStore()
 	const queryClient = useQueryClient()
 
 	const { data, isLoading, error } = useQuery({
@@ -19,7 +19,6 @@ export function usePost(postId) {
 	const toggleLikeMutation = useMutation({
 		mutationFn: () => apiClient.toggleLike(postId),
 		onSuccess: (data) => {
-			const { updatePostLike } = usePostStore.getState()
 			updatePostLike(postId, data.data.isLiked, data.data.likeCount)
 			queryClient.invalidateQueries(["post", postId])
 			queryClient.invalidateQueries(["posts"])
@@ -32,5 +31,6 @@ export function usePost(postId) {
 		error: error?.message,
 		toggleLike: toggleLikeMutation.mutate,
 		isToggling: toggleLikeMutation.isPending,
+		toggleError: toggleLikeMutation.error?.message,
 	}
 }

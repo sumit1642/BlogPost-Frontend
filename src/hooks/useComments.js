@@ -1,5 +1,5 @@
 // src/hooks/useComments.js
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { usePostStore } from "../stores/postStore"
 import { apiClient } from "../api/client"
 
@@ -21,6 +21,7 @@ export function useComments(postId) {
 		onSuccess: (data) => {
 			addComment(data.data.comment)
 			queryClient.invalidateQueries(["post", postId])
+			queryClient.invalidateQueries(["posts"])
 		},
 	})
 
@@ -36,6 +37,7 @@ export function useComments(postId) {
 		onSuccess: (_, commentId) => {
 			removeComment(commentId)
 			queryClient.invalidateQueries(["post", postId])
+			queryClient.invalidateQueries(["posts"])
 		},
 	})
 
@@ -49,5 +51,8 @@ export function useComments(postId) {
 		isAdding: addCommentMutation.isPending,
 		isUpdating: updateCommentMutation.isPending,
 		isDeleting: deleteCommentMutation.isPending,
+		addError: addCommentMutation.error?.message,
+		updateError: updateCommentMutation.error?.message,
+		deleteError: deleteCommentMutation.error?.message,
 	}
 }

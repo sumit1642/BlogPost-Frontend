@@ -1,5 +1,5 @@
 // src/components/ProfilePage.jsx
-import React, { useState } from "react";
+import React, { useState } from "react"
 import {
 	Container,
 	Paper,
@@ -9,12 +9,16 @@ import {
 	Box,
 	Alert,
 	CircularProgress,
+	Divider,
+	Card,
+	CardContent,
+	Avatar,
 } from "@mui/material"
 import { useProfile } from "../hooks/useProfile"
 import { useAuth } from "../hooks/useAuth"
 
 export function ProfilePage() {
-	const { profile, isLoading, updateProfile, isUpdating, updateError } = useProfile()
+	const { profile, isLoading, error, updateProfile, isUpdating, updateError } = useProfile()
 	const { user } = useAuth()
 	const [formData, setFormData] = useState({
 		name: "",
@@ -58,10 +62,66 @@ export function ProfilePage() {
 		)
 	}
 
+	if (error) {
+		return (
+			<Container
+				maxWidth="sm"
+				sx={{ py: 4 }}>
+				<Alert
+					severity="error"
+					sx={{ mb: 2 }}>
+					{error}
+				</Alert>
+			</Container>
+		)
+	}
+
 	return (
 		<Container
 			maxWidth="sm"
 			sx={{ py: 4 }}>
+			{/* Profile Display Card */}
+			<Card
+				elevation={2}
+				sx={{ mb: 4 }}>
+				<CardContent>
+					<Box
+						display="flex"
+						alignItems="center"
+						gap={2}
+						mb={2}>
+						<Avatar
+							sx={{
+								bgcolor: "#1976d2",
+								width: 64,
+								height: 64,
+								fontSize: "1.5rem",
+							}}>
+							{profile?.name?.charAt(0) || user?.name?.charAt(0) || "U"}
+						</Avatar>
+						<Box>
+							<Typography
+								variant="h5"
+								sx={{ fontWeight: 600 }}>
+								{profile?.name || user?.name || "User"}
+							</Typography>
+							<Typography
+								variant="body2"
+								color="text.secondary">
+								{profile?.email || user?.email}
+							</Typography>
+						</Box>
+					</Box>
+					{profile?.bio && (
+						<Typography
+							variant="body1"
+							color="text.secondary">
+							{profile.bio}
+						</Typography>
+					)}
+				</CardContent>
+			</Card>
+
 			<Paper
 				elevation={3}
 				sx={{ p: 4 }}>
@@ -71,6 +131,8 @@ export function ProfilePage() {
 					sx={{ fontWeight: 600 }}>
 					Profile Settings
 				</Typography>
+
+				<Divider sx={{ mb: 3 }} />
 
 				{success && (
 					<Alert
@@ -97,6 +159,7 @@ export function ProfilePage() {
 						value={formData.name}
 						onChange={(e) => setFormData({ ...formData, name: e.target.value })}
 						sx={{ mb: 2 }}
+						required
 					/>
 
 					<TextField
@@ -107,6 +170,8 @@ export function ProfilePage() {
 						value={formData.bio}
 						onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
 						sx={{ mb: 3 }}
+						placeholder="Tell us about yourself..."
+						helperText="Optional: Share a brief description about yourself"
 					/>
 
 					<Button

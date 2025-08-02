@@ -1,5 +1,5 @@
 // src/components/EditPostDialog.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"
 import {
 	Dialog,
 	DialogTitle,
@@ -13,6 +13,7 @@ import {
 	Box,
 	Chip,
 	IconButton,
+	Typography,
 } from "@mui/material"
 import { Add, Close } from "@mui/icons-material"
 import { usePosts } from "../hooks/usePosts"

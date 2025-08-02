@@ -1,4 +1,4 @@
-// Update src/components/MyPostsPage.jsx 
+// src/components/MyPostsPage.jsx
 
 import React, { useState } from "react"
 import {
@@ -32,6 +32,7 @@ export function MyPostsPage() {
 	const [editDialogOpen, setEditDialogOpen] = useState(false)
 	const [selectedPost, setSelectedPost] = useState(null)
 	const [anchorEl, setAnchorEl] = useState(null)
+	const [deleteError, setDeleteError] = useState("")
 	const navigate = useNavigate()
 
 	const handleMenuOpen = (event, post) => {
@@ -46,17 +47,26 @@ export function MyPostsPage() {
 	}
 
 	const handleEdit = () => {
-		setEditDialogOpen(true)
+		if (selectedPost) {
+			setEditDialogOpen(true)
+		}
 		handleMenuClose()
 	}
 
 	const handleDelete = async () => {
 		if (!selectedPost) return
 
-		if (window.confirm("Are you sure you want to delete this post?")) {
+		const confirmDelete = window.confirm(
+			`Are you sure you want to delete "${selectedPost.title}"? This action cannot be undone.`,
+		)
+
+		if (confirmDelete) {
 			try {
+				setDeleteError("")
 				await deletePost(selectedPost.id)
+				// Success handled by react-query invalidation
 			} catch (error) {
+				setDeleteError(error.message || "Failed to delete post")
 				console.error("Failed to delete post:", error)
 			}
 		}
@@ -64,8 +74,14 @@ export function MyPostsPage() {
 	}
 
 	const handleView = () => {
-		navigate(`/post/${selectedPost.id}`)
+		if (selectedPost) {
+			navigate(`/post/${selectedPost.id}`)
+		}
 		handleMenuClose()
+	}
+
+	const handleCardClick = (post) => {
+		navigate(`/post/${post.id}`)
 	}
 
 	const formatDate = (dateString) => {
@@ -118,7 +134,7 @@ export function MyPostsPage() {
 					variant="h3"
 					component="h1"
 					sx={{ fontWeight: 600 }}>
-					My Posts
+					My Posts ({userPosts.length})
 				</Typography>
 				<Button
 					variant="contained"
@@ -127,6 +143,15 @@ export function MyPostsPage() {
 					New Post
 				</Button>
 			</Box>
+
+			{deleteError && (
+				<Alert
+					severity="error"
+					sx={{ mb: 2 }}
+					onClose={() => setDeleteError("")}>
+					{deleteError}
+				</Alert>
+			)}
 
 			{userPosts.length === 0 ? (
 				<Box
@@ -138,8 +163,15 @@ export function MyPostsPage() {
 						gutterBottom>
 						You haven't created any posts yet.
 					</Typography>
+					<Typography
+						variant="body2"
+						color="text.secondary"
+						paragraph>
+						Start sharing your thoughts with the community!
+					</Typography>
 					<Button
 						variant="contained"
+						startIcon={<Add />}
 						onClick={() => setCreateDialogOpen(true)}>
 						Create Your First Post
 					</Button>
@@ -156,7 +188,9 @@ export function MyPostsPage() {
 									transform: "translateY(-2px)",
 								},
 								transition: "all 0.3s ease",
-							}}>
+								cursor: "pointer",
+							}}
+							onClick={() => handleCardClick(post)}>
 							<CardContent sx={{ p: 3 }}>
 								<Box
 									display="flex"
@@ -179,18 +213,26 @@ export function MyPostsPage() {
 												label={post.published ? "Published" : "Draft"}
 												size="small"
 												color={post.published ? "success" : "default"}
+												variant={post.published ? "filled" : "outlined"}
 											/>
 										</Box>
 										<Typography
 											variant="caption"
 											color="text.secondary">
-											{formatDate(post.createdAt)}
+											Created: {formatDate(post.createdAt)}
+											{post.updatedAt !== post.createdAt && (
+												<> • Updated: {formatDate(post.updatedAt)}</>
+											)}
 										</Typography>
 									</Box>
 
 									<IconButton
 										onClick={(e) => handleMenuOpen(e, post)}
-										disabled={isDeleting}>
+										disabled={isDeleting}
+										size="small"
+										sx={{
+											"&:hover": { backgroundColor: "rgba(0,0,0,0.04)" },
+										}}>
 										<MoreVert />
 									</IconButton>
 								</Box>
@@ -199,7 +241,14 @@ export function MyPostsPage() {
 									variant="body1"
 									color="text.secondary"
 									paragraph
-									sx={{ mb: 3 }}>
+									sx={{
+										mb: 3,
+										display: "-webkit-box",
+										WebkitLineClamp: 3,
+										WebkitBoxOrient: "vertical",
+										overflow: "hidden",
+										textOverflow: "ellipsis",
+									}}>
 									{post.content}
 								</Typography>
 
@@ -233,20 +282,25 @@ export function MyPostsPage() {
 									<Box
 										display="flex"
 										alignItems="center"
-										gap={2}>
+										gap={3}>
 										<Typography
 											variant="body2"
 											color="text.secondary">
-											{post.likesCount}{" "}
+											👍 {post.likesCount}{" "}
 											{post.likesCount === 1 ? "like" : "likes"}
 										</Typography>
 										<Typography
 											variant="body2"
 											color="text.secondary">
-											{post.commentsCount}{" "}
+											💬 {post.commentsCount}{" "}
 											{post.commentsCount === 1 ? "comment" : "comments"}
 										</Typography>
 									</Box>
+									<Typography
+										variant="caption"
+										color="text.secondary">
+										Click to view details
+									</Typography>
 								</Box>
 							</CardContent>
 						</Card>
@@ -254,34 +308,61 @@ export function MyPostsPage() {
 				</Box>
 			)}
 
+			{/* Floating Action Button */}
 			<Fab
 				color="primary"
-				aria-label="add"
-				sx={{ position: "fixed", bottom: 16, right: 16 }}
+				aria-label="add post"
+				sx={{
+					position: "fixed",
+					bottom: 24,
+					right: 24,
+					"&:hover": {
+						transform: "scale(1.1)",
+					},
+					transition: "transform 0.2s ease",
+				}}
 				onClick={() => setCreateDialogOpen(true)}>
 				<Add />
 			</Fab>
 
+			{/* Context Menu */}
 			<Menu
 				anchorEl={anchorEl}
 				open={Boolean(anchorEl)}
-				onClose={handleMenuClose}>
-				<MenuItem onClick={handleView}>
-					<Visibility sx={{ mr: 1 }} />
-					View
-				</MenuItem>
-				<MenuItem onClick={handleEdit}>
-					<Edit sx={{ mr: 1 }} />
-					Edit
+				onClose={handleMenuClose}
+				transformOrigin={{ horizontal: "right", vertical: "top" }}
+				anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+				PaperProps={{
+					sx: {
+						minWidth: 150,
+						boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+					},
+				}}>
+				<MenuItem
+					onClick={handleView}
+					sx={{ "&:hover": { backgroundColor: "rgba(25, 118, 210, 0.04)" } }}>
+					<Visibility sx={{ mr: 2, fontSize: 20 }} />
+					View Post
 				</MenuItem>
 				<MenuItem
+					onClick={handleEdit}
+					sx={{ "&:hover": { backgroundColor: "rgba(25, 118, 210, 0.04)" } }}>
+					<Edit sx={{ mr: 2, fontSize: 20 }} />
+					Edit Post
+				</MenuItem>
+				<Divider />
+				<MenuItem
 					onClick={handleDelete}
-					sx={{ color: "error.main" }}>
-					<Delete sx={{ mr: 1 }} />
-					Delete
+					sx={{
+						color: "error.main",
+						"&:hover": { backgroundColor: "rgba(211, 47, 47, 0.04)" },
+					}}>
+					<Delete sx={{ mr: 2, fontSize: 20 }} />
+					Delete Post
 				</MenuItem>
 			</Menu>
 
+			{/* Dialogs */}
 			<CreatePostDialog
 				open={createDialogOpen}
 				onClose={() => setCreateDialogOpen(false)}
@@ -289,7 +370,10 @@ export function MyPostsPage() {
 
 			<EditPostDialog
 				open={editDialogOpen}
-				onClose={() => setEditDialogOpen(false)}
+				onClose={() => {
+					setEditDialogOpen(false)
+					setSelectedPost(null)
+				}}
 				post={selectedPost}
 			/>
 		</Container>
