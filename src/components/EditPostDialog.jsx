@@ -1,5 +1,5 @@
 // src/components/EditPostDialog.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"
 import {
 	Dialog,
 	DialogTitle,
@@ -13,6 +13,7 @@ import {
 	Box,
 	Chip,
 	IconButton,
+	Typography,
 } from "@mui/material"
 import { Add, Close } from "@mui/icons-material"
 import { usePosts } from "../hooks/usePosts"
@@ -92,7 +93,15 @@ export function EditPostDialog({ open, onClose, post }) {
 			maxWidth="md"
 			fullWidth>
 			<form onSubmit={handleSubmit}>
-				<DialogTitle>Edit Post</DialogTitle>
+				<DialogTitle
+					sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+					Edit Post
+					<IconButton
+						onClick={handleClose}
+						sx={{ color: "grey.500" }}>
+						<Close />
+					</IconButton>
+				</DialogTitle>
 
 				<DialogContent>
 					{error && (
