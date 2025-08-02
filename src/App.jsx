@@ -6,6 +6,11 @@ import { Navbar } from "./components/Navbar"
 import { HomePage } from "./components/HomePage"
 import { LoginPage } from "./components/auth/LoginPage"
 import { RegisterPage } from "./components/auth/RegisterPage"
+import { CreatePost } from "./components/posts/CreatePost"
+import { EditPost } from "./components/posts/EditPost"
+import { MyPosts } from "./components/posts/MyPosts"
+import { PostDetail } from "./components/posts/PostDetail"
+import { UserPosts } from "./components/posts/UserPosts"
 
 // Base URL for API calls - will be used later
 export const BASE_URL = "http://localhost:3000"
@@ -63,6 +68,7 @@ const theme = createTheme({
 
 function App() {
 	const routes = createBrowserRouter([
+		// Home route
 		{
 			path: `/`,
 			element: (
@@ -72,6 +78,7 @@ function App() {
 				</>
 			),
 		},
+		// Auth routes
 		{
 			path: `/login`,
 			element: (
@@ -87,6 +94,53 @@ function App() {
 				<>
 					<Navbar />
 					<RegisterPage />
+				</>
+			),
+		},
+		// Post management routes
+		{
+			path: `/create-post`,
+			element: (
+				<>
+					<Navbar />
+					<CreatePost />
+				</>
+			),
+		},
+		{
+			path: `/edit-post/:postId`,
+			element: (
+				<>
+					<Navbar />
+					<EditPost />
+				</>
+			),
+		},
+		{
+			path: `/my-posts`,
+			element: (
+				<>
+					<Navbar />
+					<MyPosts />
+				</>
+			),
+		},
+		// Post viewing routes
+		{
+			path: `/post/:postId`,
+			element: (
+				<>
+					<Navbar />
+					<PostDetail />
+				</>
+			),
+		},
+		{
+			path: `/user/:userId/posts`,
+			element: (
+				<>
+					<Navbar />
+					<UserPosts />
 				</>
 			),
 		},
