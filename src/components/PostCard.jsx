@@ -1,5 +1,5 @@
 // src/components/PostCard.jsx
-import React from "react";
+import React from "react"
 import {
 	Card,
 	CardContent,
@@ -71,7 +71,7 @@ export function PostCard({ post, onClick }) {
 				<Typography
 					variant="body1"
 					color="text.secondary"
-					paragraph
+					component="p"
 					sx={{ mb: 3 }}>
 					{post.content}
 				</Typography>

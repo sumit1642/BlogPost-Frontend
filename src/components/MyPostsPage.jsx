@@ -15,7 +15,6 @@ import {
 	Card,
 	CardContent,
 	Chip,
-	Avatar,
 	Divider,
 } from "@mui/material"
 import { Add, MoreVert, Edit, Delete, Visibility } from "@mui/icons-material"
@@ -166,7 +165,8 @@ export function MyPostsPage() {
 					<Typography
 						variant="body2"
 						color="text.secondary"
-						paragraph>
+						component="p"
+						sx={{ mb: 2 }}>
 						Start sharing your thoughts with the community!
 					</Typography>
 					<Button
@@ -240,7 +240,7 @@ export function MyPostsPage() {
 								<Typography
 									variant="body1"
 									color="text.secondary"
-									paragraph
+									component="p"
 									sx={{
 										mb: 3,
 										display: "-webkit-box",

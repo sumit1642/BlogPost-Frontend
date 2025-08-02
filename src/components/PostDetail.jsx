@@ -1,5 +1,5 @@
 // src/components/PostDetail.jsx
-import React from "react";
+import React from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import {
 	Container,
@@ -163,6 +163,7 @@ export function PostDetail() {
 
 				<Typography
 					variant="body1"
+					component="div"
 					sx={{ mb: 3, lineHeight: 1.8 }}>
 					{post.content}
 				</Typography>
